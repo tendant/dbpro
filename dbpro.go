@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"log"
-	"math/rand"
 	"reflect"
 	"strconv"
 
@@ -21,11 +20,11 @@ var fns = template.FuncMap{
 
 const sqlTemplate = `INSERT INTO %s ({{$n := len .}}{{range  $i, $e := .}}{{$e}}{{if lt (plus1 $i) $n}},{{end}}{{end}}) VALUES ({{$n := len .}}{{range  $i, $e := .}}:{{$e}}{{if lt (plus1 $i) $n}},{{end}}{{end}}); select ID = convert(bigint, SCOPE_IDENTITY())`
 
-func GenInsertQuery(table string, values interface{}) (string, error) {
+func GenInsertQuery(driverName string, table string, values interface{}) (string, error) {
 	fields := reflect.VisibleFields(reflect.TypeOf(values))
 	var names []string
 	for _, item := range fields {
-		log.Println(item.Name)
+		// log.Println(item.Name)
 		names = append(names, item.Name)
 	}
 	formatted := fmt.Sprintf(sqlTemplate, table)
@@ -42,15 +41,14 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 
 	// if its a pointer, resolve its value
 	if val.Kind() == reflect.Ptr {
-		log.Println("it is still a pointer")
+		// log.Println("it is still a pointer")
 		val = reflect.Indirect(val)
 	}
 
 	// should double check we now have a struct (could still be anything)
 	if val.Kind() != reflect.Struct {
-		log.Fatal("unexpected type")
-	} else {
-		log.Println("val is a struct now")
+		// log.Fatal("unexpected type")
+		return nil, errors.New(fmt.Sprintf("Unexpected type: %s", val.Kind()))
 	}
 
 	m := make(map[string]interface{})
@@ -62,10 +60,10 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 
 		f := valueField.Interface()
 		val := reflect.ValueOf(f)
-		t := reflect.TypeOf(f)
-		log.Println("type of f:", t)
-		log.Println("value of f:", val.String())
-		log.Println("testtest:", rand.Intn(2) == 1)
+		// t := reflect.TypeOf(f)
+		// log.Println("type of f:", t)
+		// log.Println("value of f:", val.String())
+		// log.Println("testtest:", rand.Intn(2) == 1)
 		switch val.Kind() {
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			m[typeField.Name] = strconv.FormatInt(val.Int(), 10)
@@ -80,23 +78,41 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 	return m, nil
 }
 
+var supportedDrivers = []string{"postgres", "mssql"}
+
+// https://play.golang.org/p/Qg_uv_inCek
+// contains checks if a string is present in a slice
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
+}
+
 func InsertRow(db *sqlx.DB, table string, entity interface{}) (int64, error) {
 
-	stmt, err := GenInsertQuery(table, entity)
+	driverName := db.DriverName()
+	if !contains(supportedDrivers, driverName) {
+		return -1, errors.New(fmt.Sprintf("Driver(%s) is not supported. Supported drivers: %v", driverName, supportedDrivers))
+	}
+	stmt, err := GenInsertQuery(db.DriverName(), table, entity)
 	if err != nil {
-		log.Fatal("Failed generate insert Query!", err)
+		// log.Fatal("Failed generate insert Query!", err)
 		return -1, err
 	}
 
 	vals, err := GenInsertValues(entity)
 	if err != nil {
-		log.Fatal("Failed generate insert Values!", err)
+		// log.Fatal("Failed generate insert Values!", err)
 		return -1, err
 	}
 
 	rows, err := db.NamedQuery(stmt, vals)
 	if err != nil {
-		log.Fatal(fmt.Sprintf("Failed running query: %s", stmt), err)
+		// log.Fatal(fmt.Sprintf("Failed running query: %s", stmt), err)
 		return -1, err
 	}
 
@@ -106,7 +122,7 @@ func InsertRow(db *sqlx.DB, table string, entity interface{}) (int64, error) {
 		if err := rows.Scan(&id); err != nil {
 			return -1, err
 		}
-		log.Println("Created record: ", id)
+		// log.Println("Created record: ", id)
 		return id, nil
 	}
 	return -1, errors.New("Failed getting created record id!")
