@@ -26,3 +26,16 @@ func TestGenInsertQuery(t *testing.T) {
 	assert.Equal(t, query, expected)
 
 }
+
+func TestGenInsertValues(t *testing.T) {
+	actual, err := GenInsertValues(SampleTable{
+		ColumnA: "column1",
+		ColumnB: "column2",
+		ColumnC: 3,
+	})
+
+	expected := map[string]interface{}{"ColumnA": "column1", "ColumnB": "column2", "ColumnC": "3"}
+
+	assert.Equal(t, expected, actual)
+	assert.Nil(t, err)
+}
