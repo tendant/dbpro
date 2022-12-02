@@ -78,7 +78,7 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 	return m, nil
 }
 
-var supportedDrivers = []string{"postgres", "mssql"}
+var supportedDrivers = []string{"postgres", "sqlserver"}
 
 // https://play.golang.org/p/Qg_uv_inCek
 // contains checks if a string is present in a slice
