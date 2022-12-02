@@ -1,2 +1,2 @@
-# db-gen-fixture
-Tools for generating database testing fixture
+# dbpro
+Tools for producing and generating database testing fixture
