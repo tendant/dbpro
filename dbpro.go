@@ -71,6 +71,10 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 			m[typeField.Name] = val.String()
 		case reflect.Bool:
 			m[typeField.Name] = val.Bool()
+		case reflect.Float32:
+			m[typeField.Name] = val.Float()
+		case reflect.Float64:
+			m[typeField.Name] = val.Float()
 		default:
 			log.Println("NOT SUPPORTED:", val.Kind())
 			return nil, errors.New(fmt.Sprintf("Unsupported kind: %s", val.Kind()))
