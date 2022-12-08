@@ -34,11 +34,6 @@ func GenInsertQuery(driverName string, table string, values interface{}, exclude
 			fmt.Println("GenInsertQuery Exclude field:", item.Name)
 			continue
 		}
-		if item.Name == "ID" {
-			fmt.Println("ID:")
-			fmt.Println("field:", field)
-			fmt.Println("kind:", field.Kind())
-		}
 		if field.Kind() == reflect.Struct {
 			if field.IsZero() {
 				fmt.Println("Empty struct field:", item.Name)
@@ -47,9 +42,6 @@ func GenInsertQuery(driverName string, table string, values interface{}, exclude
 				names = append(names, item.Name)
 			}
 		} else {
-			if item.Name == "ID" && field.IsZero() {
-				continue
-			}
 			names = append(names, item.Name)
 		}
 	}
