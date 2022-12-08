@@ -75,6 +75,22 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 			m[typeField.Name] = val.Float()
 		case reflect.Float64:
 			m[typeField.Name] = val.Float()
+		case reflect.Struct:
+			// m[typeField.Name] = val.Interface().(sql.NullString).String
+			vi := reflect.ValueOf(val.Interface())
+			// fmt.Println("type name:", vi.Type().Name())
+			if vi.FieldByName("Valid").Bool() {
+				typeName := vi.Type().Name()
+				switch typeName {
+				case "NullString":
+					m[typeField.Name] = vi.FieldByName("String").String()
+				case "NullBool":
+					m[typeField.Name] = vi.FieldByName("Bool").Bool()
+				}
+			} else {
+				// fmt.Println("Null field, continue")
+				continue
+			}
 		default:
 			log.Println("NOT SUPPORTED:", val.Kind())
 			return nil, errors.New(fmt.Sprintf("Unsupported kind: %s", val.Kind()))
@@ -82,6 +98,10 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 	}
 
 	return m, nil
+}
+
+func reflectStruct(interface{}) {
+
 }
 
 var supportedDrivers = []string{"postgres", "sqlserver"}
