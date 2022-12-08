@@ -32,9 +32,10 @@ func GenInsertQuery(driverName string, table string, values interface{}) (string
 		if item.Name == "LastModificationTime" {
 			fmt.Println("LastModificationTime:")
 			fmt.Println("field:", field)
+			fmt.Println("field: IsNil", field.IsNil())
 			fmt.Println("kind:", field.Kind())
 		}
-		if (field == reflect.Value{} && field.Kind() == reflect.Struct) {
+		if field.IsNil() && field.Kind() == reflect.Struct {
 			fmt.Println("Empty struct field:", item.Name)
 			continue
 		} else {
