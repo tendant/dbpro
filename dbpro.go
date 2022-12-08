@@ -2,6 +2,7 @@ package dbpro
 
 import (
 	"bytes"
+	"database/sql"
 	"errors"
 	"fmt"
 	"html/template"
@@ -87,18 +88,26 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 			case "database/sql.NullString":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("String").String()
+				} else {
+					m[typeField.Name] = sql.NullString{String: "", Valid: false}
 				}
 			case "database/sql.NullBool":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("Bool").Bool()
+				} else {
+					m[typeField.Name] = sql.NullBool{Bool: false, Valid: false}
 				}
 			case "database/sql.NullInt64":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("Int64").Int()
+				} else {
+					m[typeField.Name] = sql.NullInt64{Int64: -1, Valid: false}
 				}
 			case "database/sql.NullTime":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("Time").Interface().(time.Time)
+				} else {
+					m[typeField.Name] = sql.NullTime{Time: time.Now(), Valid: false}
 				}
 			case "time.Time":
 				m[typeField.Name] = val.Interface().(time.Time)
