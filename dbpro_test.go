@@ -19,7 +19,7 @@ func TestGenInsertQuery(t *testing.T) {
 	query, err := GenInsertQuery("mssql", "SampleTable", SampleTable{
 		ColumnA: "column1",
 		ColumnB: "column2",
-		ColumnC: 3,
+		ColumnC: 0,
 		// ColumnD: sql.NullString{
 		// 	String: "columnd",
 		// 	Valid:  true,
