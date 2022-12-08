@@ -78,21 +78,23 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 		case reflect.Struct:
 			// m[typeField.Name] = val.Interface().(sql.NullString).String
 			vi := reflect.ValueOf(val.Interface())
-			// fmt.Println("type name:", vi.Type().Name())
-			if vi.FieldByName("Valid").Bool() {
-				typeName := vi.Type().Name()
-				switch typeName {
-				case "NullString":
+			fmt.Println("type name:", vi.Type().Name())
+			typeName := vi.Type().Name()
+			switch typeName {
+			case "NullString":
+				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("String").String()
-				case "NullBool":
+				}
+			case "NullBool":
+				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("Bool").Bool()
 				}
-			} else {
-				// fmt.Println("Null field, continue")
-				continue
+			default:
+				log.Println("NOT SUPPORTED TYPE:", typeName)
+				return nil, errors.New(fmt.Sprintf("Unsupported type: %s", typeName))
 			}
 		default:
-			log.Println("NOT SUPPORTED:", val.Kind())
+			log.Println("NOT SUPPORTED KIND:", val.Kind())
 			return nil, errors.New(fmt.Sprintf("Unsupported kind: %s", val.Kind()))
 		}
 	}
