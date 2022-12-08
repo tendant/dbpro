@@ -73,9 +73,6 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 		// log.Println("type of f:", t)
 		// log.Println("value of f:", val.String())
 		// log.Println("testtest:", rand.Intn(2) == 1)
-		if val.IsZero() { // skip no value field
-			continue
-		}
 		switch val.Kind() {
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			m[typeField.Name] = strconv.FormatInt(val.Int(), 10)
@@ -88,6 +85,9 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 		case reflect.Float64:
 			m[typeField.Name] = val.Float()
 		case reflect.Struct:
+			if val.IsZero() { // skip no value struc field
+				continue
+			}
 			// m[typeField.Name] = val.Interface().(sql.NullString).String
 			vi := reflect.ValueOf(val.Interface())
 			// fmt.Println("type name:", vi.Type().Name())
