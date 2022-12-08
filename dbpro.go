@@ -159,17 +159,16 @@ func InsertRow(db *sqlx.DB, table string, entity interface{}) (int64, error) {
 		return -1, errors.New(fmt.Sprintf("Driver(%s) is not supported. Supported drivers: %v", driverName, supportedDrivers))
 	}
 	stmt, err := GenInsertQuery(db.DriverName(), table, entity)
+	fmt.Println("Generated stmt:", stmt)
 	if err != nil {
 		// log.Fatal("Failed generate insert Query!", err)
-		fmt.Println("Generated stmt:", stmt)
 		return -1, err
 	}
 
 	vals, err := GenInsertValues(entity)
+	fmt.Println("Generated values:", vals)
 	if err != nil {
 		// log.Fatal("Failed generate insert Values!", err)
-		fmt.Println("Generated stmt:", stmt)
-		fmt.Println("Generated values:", vals)
 		return -1, err
 	}
 
