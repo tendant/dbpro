@@ -159,21 +159,24 @@ func InsertRow(db *sqlx.DB, table string, entity interface{}) (int64, error) {
 		return -1, errors.New(fmt.Sprintf("Driver(%s) is not supported. Supported drivers: %v", driverName, supportedDrivers))
 	}
 	stmt, err := GenInsertQuery(db.DriverName(), table, entity)
-	fmt.Println("Generated stmt:", stmt)
 	if err != nil {
+		fmt.Println("Generated stmt:", stmt)
 		// log.Fatal("Failed generate insert Query!", err)
 		return -1, err
 	}
 
 	vals, err := GenInsertValues(entity)
-	fmt.Println("Generated values:", vals)
 	if err != nil {
+		fmt.Println("Generated stmt:", stmt)
+		fmt.Println("Generated values:", vals)
 		// log.Fatal("Failed generate insert Values!", err)
 		return -1, err
 	}
 
 	rows, err := db.NamedQuery(stmt, vals)
 	if err != nil {
+		fmt.Println("Generated stmt:", stmt)
+		fmt.Println("Generated values:", vals)
 		// log.Fatal(fmt.Sprintf("Failed running query: %s", stmt), err)
 		return -1, err
 	}
@@ -187,5 +190,7 @@ func InsertRow(db *sqlx.DB, table string, entity interface{}) (int64, error) {
 		// log.Println("Created record: ", id)
 		return id, nil
 	}
+	fmt.Println("Generated stmt:", stmt)
+	fmt.Println("Generated values:", vals)
 	return -1, errors.New("Failed getting created record id!")
 }
