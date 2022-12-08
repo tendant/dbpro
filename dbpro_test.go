@@ -20,10 +20,14 @@ func TestGenInsertQuery(t *testing.T) {
 		ColumnA: "column1",
 		ColumnB: "column2",
 		ColumnC: 3,
-		ColumnD: sql.NullString{
-			String: "columnd",
-			Valid:  true,
-		},
+		// ColumnD: sql.NullString{
+		// 	String: "columnd",
+		// 	Valid:  true,
+		// },
+		// ColumnE: sql.NullBool{
+		// 	Bool:  false,
+		// 	Valid: false,
+		// },
 	})
 
 	if err != nil {
@@ -41,7 +45,14 @@ func TestGenInsertValues(t *testing.T) {
 		ColumnC: 3,
 	})
 
-	expected := map[string]interface{}{"ColumnA": "column1", "ColumnB": "column2", "ColumnC": "3"}
+	expected := map[string]interface{}{"ColumnA": "column1", "ColumnB": "column2", "ColumnC": "3"} // "ColumnD": sql.NullString{
+	// 	String: "",
+	// 	Valid:  false,
+	// },
+	// "ColumnE": sql.NullBool{
+	// 	Bool:  false,
+	// 	Valid: false,
+	// },
 
 	assert.Equal(t, expected, actual)
 	assert.Nil(t, err)
@@ -58,7 +69,10 @@ func TestGenInsertValuesWithNotNullString(t *testing.T) {
 		},
 	})
 
-	expected := map[string]interface{}{"ColumnA": "column1", "ColumnB": "column2", "ColumnC": "3", "ColumnD": "columnd"}
+	expected := map[string]interface{}{"ColumnA": "column1", "ColumnB": "column2", "ColumnC": "3", "ColumnD": "columnd"} // "ColumnE": sql.NullBool{
+	// 	Bool:  false,
+	// 	Valid: false,
+	// },
 
 	assert.Equal(t, expected, actual)
 	assert.Nil(t, err)

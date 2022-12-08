@@ -24,10 +24,17 @@ const sqlTemplate = `INSERT INTO %s ({{$n := len .}}{{range  $i, $e := .}}{{$e}}
 
 func GenInsertQuery(driverName string, table string, values interface{}) (string, error) {
 	fields := reflect.VisibleFields(reflect.TypeOf(values))
+	reflectValues := reflect.ValueOf(values)
 	var names []string
 	for _, item := range fields {
 		// log.Println(item.Name)
-		names = append(names, item.Name)
+		field := reflectValues.FieldByName(item.Name)
+		if field == (reflect.Value{}) {
+			// fmt.Println("Empty field:", field.Name)
+			continue
+		} else {
+			names = append(names, item.Name)
+		}
 	}
 	formatted := fmt.Sprintf(sqlTemplate, table)
 	t := template.Must(template.New("abc").Funcs(fns).Parse(formatted))
@@ -66,6 +73,9 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 		// log.Println("type of f:", t)
 		// log.Println("value of f:", val.String())
 		// log.Println("testtest:", rand.Intn(2) == 1)
+		if val.IsZero() { // skip no value field
+			continue
+		}
 		switch val.Kind() {
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			m[typeField.Name] = strconv.FormatInt(val.Int(), 10)
@@ -80,7 +90,7 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 		case reflect.Struct:
 			// m[typeField.Name] = val.Interface().(sql.NullString).String
 			vi := reflect.ValueOf(val.Interface())
-			fmt.Println("type name:", vi.Type().Name())
+			// fmt.Println("type name:", vi.Type().Name())
 			pkgPath := vi.Type().PkgPath()
 			typeName := vi.Type().Name()
 			qualifiedTypeName := fmt.Sprintf("%s.%s", pkgPath, typeName)
