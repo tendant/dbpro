@@ -92,6 +92,14 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("Bool").Bool()
 				}
+			case "sql.NullInt64":
+				if vi.FieldByName("Valid").Bool() {
+					m[typeField.Name] = vi.FieldByName("Int64").Int()
+				}
+			case "sql.NullTime":
+				if vi.FieldByName("Valid").Bool() {
+					m[typeField.Name] = vi.FieldByName("Time").Interface().(time.Time)
+				}
 			case "time.Time":
 				m[typeField.Name] = val.Interface().(time.Time)
 			default:
