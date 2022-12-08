@@ -194,6 +194,8 @@ func InsertRow(db *sqlx.DB, table string, entity interface{}) (int64, error) {
 	var id int64
 	for rows.Next() {
 		if err := rows.Scan(&id); err != nil {
+			fmt.Println("Generated stmt:", stmt)
+			fmt.Println("Generated values:", vals)
 			return -1, err
 		}
 		// log.Println("Created record: ", id)
