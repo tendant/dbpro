@@ -42,6 +42,9 @@ func GenInsertQuery(driverName string, table string, values interface{}) (string
 				names = append(names, item.Name)
 			}
 		} else {
+			if item.Name == "ID" && field.IsZero() {
+				continue
+			}
 			names = append(names, item.Name)
 		}
 	}
