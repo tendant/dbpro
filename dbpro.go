@@ -29,8 +29,8 @@ func GenInsertQuery(driverName string, table string, values interface{}) (string
 	for _, item := range fields {
 		log.Println("field name:", item.Name)
 		field := reflectValues.FieldByName(item.Name)
-		if item.Name == "LastModificationTime" {
-			fmt.Println("LastModificationTime:")
+		if item.Name == "ID" {
+			fmt.Println("ID:")
 			fmt.Println("field:", field)
 			fmt.Println("kind:", field.Kind())
 		}
