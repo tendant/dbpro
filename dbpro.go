@@ -84,19 +84,19 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 			typeName := vi.Type().Name()
 			qualifiedTypeName := fmt.Sprintf("%s.%s", pkgPath, typeName)
 			switch qualifiedTypeName {
-			case "sql.NullString":
+			case "database/sql.NullString":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("String").String()
 				}
-			case "sql.NullBool":
+			case "database/sql.NullBool":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("Bool").Bool()
 				}
-			case "sql.NullInt64":
+			case "database/sql.NullInt64":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("Int64").Int()
 				}
-			case "sql.NullTime":
+			case "database/sql.NullTime":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("Time").Interface().(time.Time)
 				}
