@@ -161,12 +161,15 @@ func InsertRow(db *sqlx.DB, table string, entity interface{}) (int64, error) {
 	stmt, err := GenInsertQuery(db.DriverName(), table, entity)
 	if err != nil {
 		// log.Fatal("Failed generate insert Query!", err)
+		fmt.Println("Generated stmt:", stmt)
 		return -1, err
 	}
 
 	vals, err := GenInsertValues(entity)
 	if err != nil {
 		// log.Fatal("Failed generate insert Values!", err)
+		fmt.Println("Generated stmt:", stmt)
+		fmt.Println("Generated values:", vals)
 		return -1, err
 	}
 
