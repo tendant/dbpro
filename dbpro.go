@@ -28,15 +28,15 @@ func GenInsertQuery(driverName string, table string, values interface{}, exclude
 	reflectValues := reflect.ValueOf(values)
 	var names []string
 	for _, item := range fields {
-		log.Println("field name:", item.Name)
+		// log.Println("field name:", item.Name)
 		field := reflectValues.FieldByName(item.Name)
 		if slices.Contains(exclude, item.Name) {
-			fmt.Println("GenInsertQuery Exclude field:", item.Name)
+			// fmt.Println("GenInsertQuery Exclude field:", item.Name)
 			continue
 		}
 		if field.Kind() == reflect.Struct {
 			if field.IsZero() {
-				fmt.Println("Empty struct field:", item.Name)
+				// fmt.Println("Empty struct field:", item.Name)
 				continue
 			} else {
 				names = append(names, item.Name)
@@ -83,7 +83,7 @@ func GenInsertValues(entity interface{}, exclude ...string) (map[string]interfac
 		// log.Println("value of f:", val.String())
 		// log.Println("testtest:", rand.Intn(2) == 1)
 		if slices.Contains(exclude, typeField.Name) {
-			fmt.Println("GenInsertValues Exclude field:", typeField.Name)
+			// fmt.Println("GenInsertValues Exclude field:", typeField.Name)
 			continue
 		}
 
