@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"k8s.io/utils/strings/slices"
 )
 
 var fns = template.FuncMap{
@@ -22,13 +23,17 @@ var fns = template.FuncMap{
 
 const sqlTemplate = `INSERT INTO %s ({{$n := len .}}{{range  $i, $e := .}}{{$e}}{{if lt (plus1 $i) $n}},{{end}}{{end}}) VALUES ({{$n := len .}}{{range  $i, $e := .}}:{{$e}}{{if lt (plus1 $i) $n}},{{end}}{{end}}); select ID = convert(bigint, SCOPE_IDENTITY())`
 
-func GenInsertQuery(driverName string, table string, values interface{}) (string, error) {
+func GenInsertQuery(driverName string, table string, values interface{}, exclude ...string) (string, error) {
 	fields := reflect.VisibleFields(reflect.TypeOf(values))
 	reflectValues := reflect.ValueOf(values)
 	var names []string
 	for _, item := range fields {
 		log.Println("field name:", item.Name)
 		field := reflectValues.FieldByName(item.Name)
+		if slices.Contains(exclude, item.Name) {
+			fmt.Println("GenInsertQuery Exclude field:", item.Name)
+			continue
+		}
 		if item.Name == "ID" {
 			fmt.Println("ID:")
 			fmt.Println("field:", field)
@@ -55,7 +60,7 @@ func GenInsertQuery(driverName string, table string, values interface{}) (string
 	return buf.String(), err
 }
 
-func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
+func GenInsertValues(entity interface{}, exclude ...string) (map[string]interface{}, error) {
 	// https://stackoverflow.com/a/67352492
 	// val := reflect.ValueOf(entity).Elem() // could be any underlying type
 	val := reflect.ValueOf(entity)
@@ -85,6 +90,11 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 		// log.Println("type of f:", t)
 		// log.Println("value of f:", val.String())
 		// log.Println("testtest:", rand.Intn(2) == 1)
+		if slices.Contains(exclude, typeField.Name) {
+			fmt.Println("GenInsertValues Exclude field:", typeField.Name)
+			continue
+		}
+
 		switch val.Kind() {
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			m[typeField.Name] = strconv.FormatInt(val.Int(), 10)
@@ -164,20 +174,20 @@ func contains(s []string, str string) bool {
 	return false
 }
 
-func InsertRow(db *sqlx.DB, table string, entity interface{}) (int64, error) {
+func InsertRow(db *sqlx.DB, table string, entity interface{}, exclude ...string) (int64, error) {
 
 	driverName := db.DriverName()
 	if !contains(supportedDrivers, driverName) {
 		return -1, errors.New(fmt.Sprintf("Driver(%s) is not supported. Supported drivers: %v", driverName, supportedDrivers))
 	}
-	stmt, err := GenInsertQuery(db.DriverName(), table, entity)
+	stmt, err := GenInsertQuery(db.DriverName(), table, entity, exclude...)
 	if err != nil {
 		fmt.Println("Generated stmt:", stmt)
 		// log.Fatal("Failed generate insert Query!", err)
 		return -1, err
 	}
 
-	vals, err := GenInsertValues(entity)
+	vals, err := GenInsertValues(entity, exclude...)
 	if err != nil {
 		fmt.Println("Generated stmt:", stmt)
 		fmt.Println("Generated values:", vals)
