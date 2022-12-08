@@ -42,12 +42,7 @@ func GenInsertQuery(driverName string, table string, values interface{}) (string
 				names = append(names, item.Name)
 			}
 		} else {
-			if field.IsZero() {
-				fmt.Println("Nil field:", item.Name, "kind:", field.Kind())
-				continue
-			} else {
-				names = append(names, item.Name)
-			}
+			names = append(names, item.Name)
 		}
 	}
 	formatted := fmt.Sprintf(sqlTemplate, table)
