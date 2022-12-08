@@ -8,6 +8,7 @@ import (
 	"log"
 	"reflect"
 	"strconv"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -79,16 +80,20 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 			// m[typeField.Name] = val.Interface().(sql.NullString).String
 			vi := reflect.ValueOf(val.Interface())
 			fmt.Println("type name:", vi.Type().Name())
+			pkgPath := vi.Type().PkgPath()
 			typeName := vi.Type().Name()
-			switch typeName {
-			case "NullString":
+			qualifiedTypeName := fmt.Sprintf("%s.%s", pkgPath, typeName)
+			switch qualifiedTypeName {
+			case "sql.NullString":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("String").String()
 				}
-			case "NullBool":
+			case "sql.NullBool":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("Bool").Bool()
 				}
+			case "time.Time":
+				m[typeField.Name] = val.Interface().(time.Time)
 			default:
 				log.Println("NOT SUPPORTED TYPE:", typeName)
 				return nil, errors.New(fmt.Sprintf("Unsupported type: %s", typeName))
