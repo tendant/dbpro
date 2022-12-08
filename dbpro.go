@@ -96,7 +96,7 @@ func GenInsertValues(entity interface{}) (map[string]interface{}, error) {
 				m[typeField.Name] = val.Interface().(time.Time)
 			default:
 				log.Println("NOT SUPPORTED TYPE:", typeName)
-				return nil, errors.New(fmt.Sprintf("Unsupported type: %s", typeName))
+				return nil, errors.New(fmt.Sprintf("Unsupported type: %s", qualifiedTypeName))
 			}
 		default:
 			log.Println("NOT SUPPORTED KIND:", val.Kind())
