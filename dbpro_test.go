@@ -13,6 +13,7 @@ type SampleTable struct {
 	ColumnC int
 	ColumnD sql.NullString
 	ColumnE sql.NullBool
+	ColumnF sql.NullFloat64
 }
 
 func TestGenInsertQuery(t *testing.T) {
@@ -33,7 +34,7 @@ func TestGenInsertQuery(t *testing.T) {
 	if err != nil {
 	}
 
-	expected := `INSERT INTO SampleTable (ColumnA,ColumnB,ColumnC,ColumnD,ColumnE) VALUES (:ColumnA,:ColumnB,:ColumnC,:ColumnD,:ColumnE); select ID = convert(bigint, SCOPE_IDENTITY())`
+	expected := `INSERT INTO SampleTable (ColumnA,ColumnB,ColumnC) VALUES (:ColumnA,:ColumnB,:ColumnC); select ID = convert(bigint, SCOPE_IDENTITY())`
 	assert.Equal(t, query, expected)
 
 }

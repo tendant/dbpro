@@ -127,6 +127,12 @@ func GenInsertValues(entity interface{}, exclude ...string) (map[string]interfac
 				} else {
 					m[typeField.Name] = sql.NullInt64{Int64: -1, Valid: false}
 				}
+			case "database/sql.NullFloat64":
+				if vi.FieldByName("Valid").Bool() {
+					m[typeField.Name] = vi.FieldByName("Float64").Int()
+				} else {
+					m[typeField.Name] = sql.NullFloat64{Float64: -1, Valid: false}
+				}
 			case "database/sql.NullTime":
 				if vi.FieldByName("Valid").Bool() {
 					m[typeField.Name] = vi.FieldByName("Time").Interface().(time.Time)
